@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<title>Imgur Search</title>
+  	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Imgur images search application">
+	<meta name="author" content="Kruthi Venkatesh">
+	<!--[if lt IE 9]
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+    <![end if]-->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  	<!-- using angular -->
+  	<div ng-app="searchApp" ng-controller="searchController">
+  		<!-- navigation controls with header and is reponsive in nature - using bootstrap -->
+	    <nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<label class="brand_label">Imgur Search</label>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<div class="navbar-right btn-style">
+						<form name="searchForm">
+							<div class="form-group">
+								<div class="col-md-9">
+									<input type="text" class="form-control" placeholder="Search" ng-model="search" name="search" required autofocus/>
+								</div>
+								<div class="col-md-3">
+									<button type="button" ng-click="findImages()" class="btn btn-primary" ng-disabled="searchForm.$invalid">
+					        		<span class="glyphicon glyphicon-search"></span>Search</button>
+				        		</div>
+				        	</div>
+	   					</form>
+					</div>
+				</div>
+			</div>
+		</nav>
+    	<!-- Comment this code in order to enable the modal mode and uncomment the below code-->
+	    <div class="container">
+	  		<div class="row">
+	      		<div class="col-lg-3 col-sm-4 col-xs-6" ng-repeat="image in images | filter:search">
+	      			<a title="{{image.snippet}}" href="{{image.context}}"><img class="thumbnail img-responsive" alt="{{image.snippet}}" title="{{image.snippet}}" ng-src="{{image.url}}"></a></div>
+	    			<hr>
+	  			</div>
+			</div>
+		</div>
+		<!-- this was created for using modal to enlarge the image , uncomment and comment the above code-->
+		<!--<div class="container">
+	  		<div class="row">
+	      		<div class="col-lg-3 col-sm-4 col-xs-6" ng-repeat="image in images | filter:search">
+	      			<a title="{{image.snippet}}" href="{{image.context}}" ng-click="enlargeImage(image)"><img class="thumbnail img-responsive" alt="{{image.snippet}}" title="{{image.snippet}}" ng-src="{{image.url}}"></a></div>
+	    			<hr>
+	    			<div tabindex="-1" class="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				  	<div class="modal-dialog modal-lg">
+				  		<div class="modal-content">
+				    		<div class="modal-header">
+								<button class="close" type="button" data-dismiss="modal">×</button>
+								<h3 class="modal-title" id="myModalLabel">{{heading}}</h3>
+							</div>
+							<div class="modal-body">
+								<img ng-src="{{imageUrl}}" class="img-responsive">
+							</div>
+				   		</div>
+				  	</div>
+				</div>
+	  			</div>
+			</div>
+		</div>-->
+		
+	<div>
+	<footer class="footer">
+		<div class="container">
+			<div class="bottom-footer">
+				<ul class="footer-nav">
+					<li>Imgur Search © 2017</li>
+					<li><a href="#">kruthi.vijay31@gmail.com</a></li>
+				</ul>
+			</div>
+		</div>
+	</footer>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+	/*$(document).ready(function() {
+		$('.thumbnail').click(function(){
+		      $('.modal-body').empty();
+		  	var title = $(this).parent('a').attr("title");
+		  	$('.modal-title').html(title);
+		  	$($(this).parents('div').html()).appendTo('.modal-body');
+		  	$('#myModal').modal({show:true});
+		});
+	});*/
+		/* angular controller*/
+		angular.module('searchApp', [])
+	  		.controller('searchController', function($scope, $http) {
+	  			//function to load images on page load
+	  			function loadImages(){
+	  				$http.get('/search/' + "all").success(function(response){
+	  					$scope.images = response;
+  					}).error(function(error){
+	                	console.log(error);
+	                });	
+	  			}
+
+	  			//function to search images based on search text imput
+	  			 $scope.findImages = function(){
+	  				$http.get('/search/' + $scope.search).success(function(response){
+	  					$scope.images = response;
+  					}).error(function(error){
+	                	console.log(error);
+	                });	
+	  			}
+
+	  			//function to bind the image info to modal
+	  			$scope.enlargeImage = function(image){
+	  				console.log(image.url);
+	  				$scope.imageUrl = image.url;
+            		$scope.heading = image.snippet;
+	  				angular.element("#myModal").modal("show");
+	  				
+	  			}
+	  			//findImages();
+	  			loadImages();
+		  	});
+	</script>
+  </body>
+</html>
